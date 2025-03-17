@@ -71,7 +71,7 @@ private:
         // 构造响应头
         RpcHeader resp_header;
         resp_header.magic = 0x12345678;
-        resp_header.body_len = data.size();
+        resp_header.body_len = data.size(); 
         resp_header.msg_id = header_.msg_id; // 复用请求的msg_id
         
         // 异步发送头部+数据
@@ -99,6 +99,7 @@ public:
         : acceptor_(io, tcp::endpoint(tcp::v4(), port)),
           dispatcher_(std::make_shared<ServiceDispatcher>()) {
         startAccept();
+        
         
         // 注册示例服务
         dispatcher_->registerService("CalculatorService", 

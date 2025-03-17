@@ -47,7 +47,7 @@ public:
             weighted_endpoints_.push_back({weights[i], i});
         }
     }
-
+    /*
     std::string selectEndpoint(const std::vector<std::string>& endpoints) override {
         if (endpoints.empty()) {
             throw std::runtime_error("No available endpoints");
@@ -61,7 +61,7 @@ public:
         }
         return endpoints[0];
     }
-
+    */
 private:
     int total_weight_ = 0;
     int current_weight_ = 0;
