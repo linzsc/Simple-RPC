@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "/usr/include/zookeeper"
+            ],
+            "defines": [
+                "THREADED"
+            ],
+            "compilerArgs": [
+                "-std=c++11",
+                "-lzookeeper_mt"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

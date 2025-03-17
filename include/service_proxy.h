@@ -1,7 +1,7 @@
 #pragma once
-#include "rpc_client.h"
+#include "client.h"
 #include "zk_wrapper.h"
-#include "load_balancer.h"
+#include "load_balance.h"
 
 template <typename Service>
 class ServiceProxy : public Service {

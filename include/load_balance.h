@@ -3,7 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <random>
-
+#include <stdexcept>
 class LoadBalancer {
 public:
     virtual std::string selectEndpoint(const std::vector<std::string>& endpoints) = 0;

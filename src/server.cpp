@@ -2,7 +2,6 @@
 #include <iostream>
 #include "rpc_protocol.h"
 #include "service_dispatcher.h"
-#include "zk_wrapper.h"
 
 using namespace boost::asio;
 using namespace boost::asio::ip;
@@ -92,17 +91,14 @@ private:
     RpcHeader header_;
     std::string body_buf_;
     ServiceDispatcher& dispatcher_;
-    
 };
 
 class RpcServer {
 public:
     RpcServer(io_context& io, short port)
-        : acceptor_(io, tcp::endpoint(tcp::v4(), port)),zk_(zk),
+        : acceptor_(io, tcp::endpoint(tcp::v4(), port)),
           dispatcher_(std::make_shared<ServiceDispatcher>()) {
         startAccept();
-
-        
         
         // 注册示例服务
         dispatcher_->registerService("CalculatorService", 
@@ -119,6 +115,10 @@ private:
         acceptor_.async_accept(
             [this](boost::system::error_code ec, tcp::socket socket) {
                 if (!ec) {
+                    //打印连接信息
+                    std::cout << "New connection from " << socket.remote_endpoint() << "\n";
+                    
+
                     std::make_shared<RpcSession>(std::move(socket), *dispatcher_)->start();
                 }
                 startAccept();
@@ -127,7 +127,6 @@ private:
 
     tcp::acceptor acceptor_;
     std::shared_ptr<ServiceDispatcher> dispatcher_;
-    ZooKeeperWrapper& zk_;
 };
 
 int main() {
@@ -141,3 +140,6 @@ int main() {
     }
     return 0;
 }
+/*
+g++ -std=c++11 -o server src/server.cpp -I include -lboost_system -lboost_thread -lnlohmann_json
+*/
