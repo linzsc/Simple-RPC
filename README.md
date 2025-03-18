@@ -31,8 +31,8 @@ graph TD
 ---
 
 ### **三、核心模块实现步骤**  
-#### **第1阶段：基础RPC通信（3天）**
-1. **协议设计**  
+#### **1.基础RPC通信**
+(1) **协议设计**  
    - 定义RPC协议头（魔数、消息ID、长度校验）  
    - 请求/响应体使用JSON序列化  
    ```cpp
@@ -46,7 +46,7 @@ graph TD
    struct RpcResponse { ... };
    ```
 
-2. **网络通信（Boost.Asio）**  
+(2) **网络通信（Boost.Asio）**  
    - 实现异步TCP服务器/客户端  
    - 解决粘包问题（Header+Body模式）  
    ```cpp
@@ -56,7 +56,7 @@ graph TD
    });
    ```
 
-3. **集成glog日志**  
+(3) **集成glog日志**  
    - 封装异步日志输出类（避免阻塞主线程）  
    ```cpp
    class AsyncLogger {
@@ -75,8 +75,8 @@ graph TD
 
 ---
 
-#### **第2阶段：服务注册与发现（3天）**
-1. **ZooKeeper集成**  
+#### **2.服务注册与发现**
+(1) **ZooKeeper集成**  
    - 使用C客户端库（如`zookeeper`或`cpp-zookeeper`）  
    - 实现服务注册接口  
    ```cpp
@@ -86,7 +86,7 @@ graph TD
    }
    ```
 
-2. **服务发现接口**  
+(2) **服务发现接口**  
    - 监听ZooKeeper节点变化，动态更新服务列表  
    ```cpp
    void watchServices(zhandle_t* zh, int type, const std::string& path) {
@@ -98,8 +98,8 @@ graph TD
 
 ---
 
-#### **第3阶段：动态代理与负载均衡（3天）**
-1. **动态代理生成**  
+#### **3.动态代理与负载均衡**
+(1) **动态代理生成**  
    - 模板类封装远程调用，生成本地方法接口  
    ```cpp
    template <typename Service>
@@ -113,7 +113,7 @@ graph TD
    };
    ```
 
-2. **负载均衡策略**  
+(2) **负载均衡策略**  
    - 实现轮询、随机、一致性哈希策略  
    ```cpp
    class LoadBalancer {
@@ -124,8 +124,8 @@ graph TD
 
 ---
 
-#### **第4阶段：性能优化（2天）**
-1. **连接池**  
+#### **4.性能优化**
+(1) **连接池**  
    - 复用TCP连接，减少握手开销  
    ```cpp
    class ConnectionPool {
@@ -134,18 +134,18 @@ graph TD
    };
    ```
 
-2. **线程池**  
+(2) **线程池**  
    - 使用Boost.Asio的`io_context`线程池  
    ```cpp
    boost::asio::thread_pool pool(4); // 4线程
    ```
 
-3. **零拷贝优化**  
+(3) **零拷贝优化**  
    - 使用`string_view`减少序列化内存拷贝  
 
 ---
 
-#### **第5阶段：测试与部署（1天）**
+#### **测试与部署**
 1. **单元测试**  
    - 使用Google Test验证协议、序列化、负载均衡逻辑  
    ```cpp
@@ -174,18 +174,20 @@ graph TD
 ```
 rpc-framework/
 ├── include/
-│   ├── rpc_protocol.h    # 协议定义
-│   ├── service_proxy.h   # 动态代理
-│   ├── load_balancer.h   # 负载均衡策略
-│   └── async_logger.h    # 异步日志
+│   ├── rpc_protocol.h         # 协议定义
+│   ├── service_proxy.h        # 动态代理
+│   ├── load_balancer.h        # 负载均衡策略
+|   ├── service_dispatcher.h   #任务分发
+|   ├── service_registry.h     #任务注册
+│   └── logger.h               # 异步日志
 ├── src/
-│   ├── server.cpp        # 服务端主逻辑
-│   ├── client.cpp        # 客户端主逻辑
-│   └── zk_wrapper.cpp    # ZooKeeper封装
+│   ├── server.cpp             # 服务端主逻辑
+│   ├── client.cpp             # 客户端主逻辑
+│   └── zk_wrapper.cpp         # ZooKeeper封装
 ├── test/
-│   ├── test_serialize.cpp # 单元测试
-│   └── benchmark.cpp     # 压测工具
-└── third_party/          # 依赖库
+│   ├── test_serialize.cpp     # 单元测试
+|   
+│   └── benchmark.cpp          # 压测工具
 ```
 
 ---
@@ -206,4 +208,4 @@ rpc-framework/
 
 ---
 
-通过此技术路线，你将在**两周内**完成一个高性能、轻量级的RPC框架，涵盖分布式系统核心功能。建议从基础通信模块开始，逐步扩展至高级功能，确保每一步通过单元测试验证。
+
