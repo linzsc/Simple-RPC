@@ -1,0 +1,7 @@
+Log file created at: 2025/03/18 10:30:04
+Running on machine: DESKTOP-TCO7TE8
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20250318 10:30:04.933445  4144 logger.cpp:58] This is an info message.
+W20250318 10:30:04.933569  4144 logger.cpp:61] This is a warning message.
+E20250318 10:30:04.933616  4144 logger.cpp:64] This is an error message.

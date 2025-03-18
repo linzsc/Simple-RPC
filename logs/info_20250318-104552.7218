@@ -1,0 +1,7 @@
+Log file created at: 2025/03/18 10:45:52
+Running on machine: DESKTOP-TCO7TE8
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20250318 10:45:52.123785  7218 logger.cpp:58] 127.0.0.1:12345
+I20250318 10:45:52.123951  7218 logger.cpp:58] 127.0.0.1:12345
+I20250318 10:45:52.123994  7218 logger.cpp:58] {"method_name":"add","params":[10,20],"service_name":"CalculatorService"}

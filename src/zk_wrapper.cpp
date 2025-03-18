@@ -54,8 +54,13 @@ void ZooKeeperWrapper::registerService(const std::string& service_name, const st
     std::string path = basePath + "/" + endpoint;
     char buffer[512];
     int buffer_len = sizeof(buffer);
+
+    // 创建临时节点
+    //int rc = zoo_create(zk_handle_, path.c_str(), "", 0, &ZOO_OPEN_ACL_UNSAFE,
+    //                    ZOO_EPHEMERAL, buffer, buffer_len);
+    // 创建持久节点
     int rc = zoo_create(zk_handle_, path.c_str(), "", 0, &ZOO_OPEN_ACL_UNSAFE,
-                        ZOO_EPHEMERAL, buffer, buffer_len);
+                        ZOO_PERSISTENT, buffer, buffer_len);
     std::cout<<rc<<std::endl;
     if (rc != ZOK && rc != ZNODEEXISTS) {
         std::cerr << "Failed to create node: " << zerror(rc) << "\n";
