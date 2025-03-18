@@ -2,16 +2,17 @@
 #include <boost/asio/buffer.hpp>
 #include <iostream>
 #include "rpc_protocol.h"
-#include "service_dispatcher.h"
-#include "service_registry.h"
-#include "zk_wrapper.h"
+#include "service_router.h"     
+#include "service_registry.h"     //服务注册
+#include "zk_wrapper.h"          //zk库api封装
+#include "service_provider.h"   //提供服务的具体方法
 using namespace boost::asio;
 using namespace boost::asio::ip;
 ZooKeeperWrapper zk("127.0.0.1:2181",3000);
 class RpcSession : public std::enable_shared_from_this<RpcSession> {
 public:
-    RpcSession(tcp::socket socket, ServiceDispatcher& dispatcher)
-        : socket_(std::move(socket)), dispatcher_(dispatcher) {}
+    RpcSession(tcp::socket socket,Router & router)
+        : socket_(std::move(socket)),router_(router) {}
     
     void start() {
         readHeader();
@@ -53,14 +54,21 @@ private:
             // 反序列化请求
             auto j = nlohmann::json::parse(body_buf_);
             RpcRequest req = j.get<RpcRequest>();
-            
+            std::cout<<"method_name:"<<req.method_name<<std::endl;
+            std::cout<<"params:"<<req.params<<std::endl;
+
             // 处理请求
-            auto result = dispatcher_.dispatch(req.service_name, req.method_name, req.params);
+            nlohmann::json result = router_.dispatch(req.method_name, req.params);
             
             // 构造响应
             RpcResponse resp;
-            resp.result = result;
-            sendResponse(resp);
+            resp.code = result["code"];
+            resp.result = result["result"];
+
+            //打印响应
+            
+
+            sendResponse(result);
         } catch (const std::exception& e) {
             std::cerr << "Handle request error: " << e.what() << "\n";
         }
@@ -92,27 +100,24 @@ private:
     tcp::socket socket_;
     RpcHeader header_;
     std::string body_buf_;
-    ServiceDispatcher& dispatcher_;
+
+    Router& router_;
 };
 
 class RpcServer {
 public:
     RpcServer(io_context& io, short port)
-        : acceptor_(io, tcp::endpoint(tcp::v4(), port)),
-          dispatcher_(std::make_shared<ServiceDispatcher>()) {
+        : acceptor_(io, tcp::endpoint(tcp::v4(), port)) {
         startAccept();
         
+        //向zk注册服务
         ServiceRegistry registry(zk);
         registry.registerService("CalculatorService", "127.0.0.1:12345");
-            
-        // 注册示例服务
-        dispatcher_->registerService("CalculatorService", 
-            [](const std::string& method, const nlohmann::json& params) {
-                if (method == "add") {
-                    return params[0].get<int>() + params[1].get<int>();
-                }
-                throw std::runtime_error("Method not found");
-            });
+         
+        router_= std::make_shared<Router>();
+        //路由添加方法
+        router_->resgister("add",  CalculatorService::add);
+
     }
 
 private:
@@ -124,14 +129,14 @@ private:
                     std::cout << "New connection from " << socket.remote_endpoint() << "\n";
                     
 
-                    std::make_shared<RpcSession>(std::move(socket), *dispatcher_)->start();
+                    std::make_shared<RpcSession>(std::move(socket), *router_)->start();
                 }
                 startAccept();
             });
     }
 
     tcp::acceptor acceptor_;
-    std::shared_ptr<ServiceDispatcher> dispatcher_;
+    std::shared_ptr<Router>router_;
 };
 
 int main() {

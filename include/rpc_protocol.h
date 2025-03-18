@@ -27,7 +27,7 @@ struct RpcRequest {
 
 // 响应消息体（JSON格式）
 struct RpcResponse {
-    int code = 0;                // 错误码
+    int code;                // 错误码
     nlohmann::json result;       // 返回值
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(RpcResponse, code, result)
 };

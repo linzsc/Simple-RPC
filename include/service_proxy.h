@@ -42,6 +42,7 @@ public:
        
         LOG_INFO(nlohmann::json(req).dump());
         RpcClient client(io_, host, port);
+
         return client.call(req);
     }
     void setServicePath(const std::string& path) {

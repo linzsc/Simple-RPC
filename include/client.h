@@ -1,7 +1,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include "rpc_protocol.h"
-
+#include "logger.h"
 using namespace boost::asio;
 using namespace boost::asio::ip;
 
@@ -33,8 +33,19 @@ class RpcClient {
             // 读取响应体
             std::string resp_body(resp_header.body_len, '\0');
             read(socket_, buffer(resp_body));
-            
-            return nlohmann::json::parse(resp_body).get<RpcResponse>().result;
+           
+            nlohmann::json resp_json = nlohmann::json::parse(resp_body.data());
+            int code = resp_json["code"].get<int>();
+            nlohmann::json result = resp_json["result"];
+            if(code!=0){
+                //std::string result = resp_json["result"];
+                LOG_ERROR(resp_json["result"]);
+                return {};
+            }
+            else{
+                return result;
+            }
+                
         }
     
     private:

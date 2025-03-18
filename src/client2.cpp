@@ -17,7 +17,7 @@ int main() {
 
     // 调用远程服务
     try {
-        int result = add.call("add", 10, 20);
+        int result = add.call("add", 10, 20,30);
         std::cout << "Result: " << result << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -26,5 +26,5 @@ int main() {
     return 0;
 }
 /*
-g++ -o client2 src/client2.cpp  src/zk_wrapper.cpp  src/logger.cpp -I include -lzookeeper_mt -DTHREADED  -std=c++11 -lpthread 
+ g++ -o client2 src/client2.cpp  src/zk_wrapper.cpp  src/logger.cpp -I include -lzookeeper_mt -DTHREADED  -std=c++11 -lpthread -lglog
 */

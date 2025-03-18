@@ -1,0 +1,5 @@
+Log file created at: 2025/03/18 16:24:34
+Running on machine: DESKTOP-TCO7TE8
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+E20250318 16:24:34.745587 19036 logger.cpp:64] Invalid parameters

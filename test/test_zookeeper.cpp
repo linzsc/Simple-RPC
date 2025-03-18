@@ -76,5 +76,5 @@ int main() {
     return 0;
 }
 /*
-g++ -o test_zk test/test_zookeeper.cpp src/zk_wrapper.cpp -lzookeeper_mt -DTHREADED -lpthread std=c++11
+g++ -o test_zk test/test_zookeeper.cpp src/zk_wrapper.cpp -I include -lzookeeper_mt -DTHREADED -lpthread -std=c++11
 */
