@@ -1,11 +1,13 @@
 #include <boost/asio.hpp>
+#include <boost/asio/buffer.hpp>
 #include <iostream>
 #include "rpc_protocol.h"
 #include "service_dispatcher.h"
-
+#include "service_registry.h"
+#include "zk_wrapper.h"
 using namespace boost::asio;
 using namespace boost::asio::ip;
-
+ZooKeeperWrapper zk("127.0.0.1:2181",3000);
 class RpcSession : public std::enable_shared_from_this<RpcSession> {
 public:
     RpcSession(tcp::socket socket, ServiceDispatcher& dispatcher)
@@ -18,7 +20,7 @@ public:
 private:
     void readHeader() {
         auto self = shared_from_this();
-        async_read(socket_, buffer(&header_, sizeof(RpcHeader)),
+        async_read(socket_, boost::asio::buffer(&header_, sizeof(RpcHeader)),
             [this, self](boost::system::error_code ec, size_t) {
                 if (ec) {
                     std::cerr << "Read header error: " << ec.message() << "\n";
@@ -35,7 +37,7 @@ private:
     void readBody() {
         auto self = shared_from_this();
         body_buf_.resize(header_.body_len);
-        async_read(socket_, buffer(body_buf_),
+        async_read(socket_, boost::asio::buffer(body_buf_),
             [this, self](boost::system::error_code ec, size_t) {
                 if (ec) {
                     std::cerr << "Read body error: " << ec.message() << "\n";
@@ -76,8 +78,8 @@ private:
         
         // 异步发送头部+数据
         std::vector<boost::asio::const_buffer> buffers;
-        buffers.push_back(buffer(&resp_header, sizeof(RpcHeader)));
-        buffers.push_back(buffer(data));
+        buffers.push_back(boost::asio::buffer(&resp_header, sizeof(RpcHeader)));
+        buffers.push_back(boost::asio::buffer(data));
         
         async_write(socket_, buffers,
             [this, self](boost::system::error_code ec, size_t) {
@@ -100,7 +102,9 @@ public:
           dispatcher_(std::make_shared<ServiceDispatcher>()) {
         startAccept();
         
-        
+        ServiceRegistry registry(zk);
+        registry.registerService("CalculatorService", "127.0.0.1:12345");
+            
         // 注册示例服务
         dispatcher_->registerService("CalculatorService", 
             [](const std::string& method, const nlohmann::json& params) {
@@ -132,6 +136,8 @@ private:
 
 int main() {
     try {
+        
+
         io_context io;
         RpcServer server(io, 12345);
         std::cout << "Server running on port 12345\n";
@@ -142,5 +148,5 @@ int main() {
     return 0;
 }
 /*
-g++ -std=c++11 -o server src/server.cpp -I include -lboost_system -lboost_thread -lnlohmann_json
+g++ -std=c++11 -o server src/server.cpp src/zk_wrapper.cpp -I include -lboost_system -lboost_thread -lzookeeper_mt -DTHREADED
 */

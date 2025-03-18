@@ -1,24 +1,36 @@
 #pragma once
 #include <string>
-#include <vector>
-#include <unordered_map>
 #include <mutex>
+#include "zk_wrapper.h"
 
 class ServiceRegistry {
 public:
-    // 注册服务实例
-    void registerService(const std::string& service_name, const std::string& endpoint) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        services_[service_name].push_back(endpoint);
+    // 构造函数
+    ServiceRegistry(ZooKeeperWrapper& zk):zk_(zk) {
     }
 
-    // 获取服务实例列表
-    std::vector<std::string> getServiceEndpoints(const std::string& service_name) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        return services_[service_name];
+    // 析构函数
+    ~ServiceRegistry() {
+    }
+
+    // 注册服务到 ZooKeeper
+    void registerService(const std::string& service_name, const std::string& endpoint) {
+
+        // 确保服务路径存在
+        std::string path = "/services/" + service_name;
+        zk_.ensurePathExists(path);
+
+        // 注册服务实例
+        zk_.registerService(service_name, endpoint);
+    }
+    //服务下线
+    void unregisterService(const std::string& service_name, const std::string& endpoint) {
+
+        // 注销服务实例
+        zk_.unregisterService(service_name, endpoint);
     }
 
 private:
-    std::unordered_map<std::string, std::vector<std::string>> services_;
-    std::mutex mutex_;
+    // ZooKeeperWrapper 实例
+    ZooKeeperWrapper& zk_;
 };

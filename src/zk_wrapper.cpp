@@ -4,7 +4,7 @@
 #include <vector>
 
 ZooKeeperWrapper::ZooKeeperWrapper(const std::string& hosts, int timeout) {
-    // 这里 watcher 参数可用于打印通知
+    
     zk_handle_ = zookeeper_init(hosts.c_str(), watcher, timeout, nullptr, nullptr, 0);
     if (!zk_handle_) {
         throw std::runtime_error("Failed to connect to ZooKeeper");
@@ -18,7 +18,7 @@ ZooKeeperWrapper::~ZooKeeperWrapper() {
 void ZooKeeperWrapper::ensurePathExists(const std::string& path) {
     size_t pos = 0; 
     std::cout<<"whole path :"<<path<<std::endl; 
-    // 依次创建 /services 及 /services/CalculatorService 等父节点
+    
     while ((pos = path.find('/', pos + 1)) ) {
         std::string subPath = path.substr(0, pos);
         std::cout<<"cur path :"<<subPath<<std::endl; 
@@ -107,5 +107,22 @@ void ZooKeeperWrapper::watchService(const std::string& service_name) {
 void ZooKeeperWrapper::watcher(zhandle_t* zh, int type, int state, const char* path, void* context) {
     if (state == ZOO_CONNECTED_STATE && type == ZOO_CHILD_EVENT) {
         std::cout << "Watch triggered: changes detected at path " << path << "\n";
+    }
+}
+
+
+void ZooKeeperWrapper::disconnect(){
+    zookeeper_close(zk_handle_);
+}
+
+void ZooKeeperWrapper::unregisterService(const std::string& service_name, const std::string& endpoint) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::string path = "/services/" + service_name + "/" + endpoint;
+    int rc = zoo_delete(zk_handle_, path.c_str(), -1);
+    if (rc != ZOK) {
+        std::cerr << "Failed to delete node: " << zerror(rc) << "\n";
+    }
+    else{
+        std::cout << "Unregistered service at: " << path << "\n";
     }
 }
