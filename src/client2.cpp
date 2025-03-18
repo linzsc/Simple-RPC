@@ -17,7 +17,7 @@ int main() {
 
     // 调用远程服务
     try {
-        int result = add.call("add", 10, 20,30);
+        int result = add.call("add", 10, 20);
         std::cout << "Result: " << result << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

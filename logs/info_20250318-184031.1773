@@ -1,0 +1,10 @@
+Log file created at: 2025/03/18 18:40:31
+Running on machine: DESKTOP-TCO7TE8
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20250318 18:40:31.988183  1773 logger.cpp:58] 127.0.0.1:12346
+I20250318 18:40:31.988361  1773 logger.cpp:58] 127.0.0.1:12345
+I20250318 18:40:31.988377  1773 logger.cpp:58] localhost:12345
+I20250318 18:40:31.988386  1773 logger.cpp:58] 127.0.0.1:12345
+I20250318 18:40:31.988422  1773 logger.cpp:58] {"method_name":"add","params":[10,20,30],"service_name":"CalculatorService"}
+E20250318 18:40:31.988816  1773 logger.cpp:64] Invalid parameters
