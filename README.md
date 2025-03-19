@@ -125,47 +125,29 @@ graph TD
 ---
 
 #### **4.性能优化**
-(1) **连接池**  
-   - 复用TCP连接，减少握手开销  
-   ```cpp
-   class ConnectionPool {
-       std::queue<TcpConnection*> pool_;
-       std::mutex mutex_;
-   };
-   ```
 
-(2) **线程池**  
+(1) **线程池**  
    - 使用Boost.Asio的`io_context`线程池  
    ```cpp
    boost::asio::thread_pool pool(4); // 4线程
    ```
 
-(3) **零拷贝优化**  
-   - 使用`string_view`减少序列化内存拷贝  
-
----
-
-#### **测试与部署**
-1. **单元测试**  
-   - 使用Google Test验证协议、序列化、负载均衡逻辑  
+(2) **对象池**  
+   - 使用RpcSession_pool对象池，减少会话的频繁创建和注销  
    ```cpp
-   TEST(RpcTest, BasicCall) {
-       auto result = client.call("add", 3, 5);
-       EXPECT_EQ(result, 8);
-   }
-   ```
+    std::shared_ptr<RpcSession> acquire(tcp::socket socket, Router &router) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (!freeSessions_.empty()) {
+                auto session = freeSessions_.front();
+                freeSessions_.pop();
+                session->reset(std::move(socket), router);
+                return session;
+            }
+            return std::make_shared<RpcSession>(std::move(socket), router);
+        }
 
-2. **压测工具**  
-   - 实现多线程压测客户端（模拟高并发场景）  
-   ```bash
-   ./benchmark --threads=100 --requests=10000
-   ```
-
-3. **Docker部署**  
-   - 编写Dockerfile一键部署服务端、客户端、ZooKeeper  
-   ```dockerfile
-   FROM ubuntu:20.04
-   RUN apt-get install -y libboost-all-dev libzookeeper-mt-dev
+   auto session = RpcSessionPool::getInstance().acquire(std::move(socket), *router_);
+  
    ```
 
 ---
@@ -192,13 +174,16 @@ rpc-framework/
 
 ---
 
-### **五、性能优化指标**
-| 场景                | 目标QPS  | 优化手段                          |
-|---------------------|---------|----------------------------------|
-| 单线程同步调用       | 1,000+  | 连接复用 + JSON序列化优化          |
-| 多线程异步调用       | 10,000+ | 线程池 + 零拷贝 + 内存池           |
-| 服务发现延迟         | <10ms   | ZooKeeper长连接 + 本地缓存         |
 
+### **五、项目优化手段与性能指标对比**
+
+| 优化手段 | 总请求数 | 总时间（秒） | QPS  |
+|:--------|:---------|:-------------|:-----|
+| 单线程  | 10000    | 4.43475      | 2254.92 |
+| 多线程  | 10000    | 3.71747      | 2690  |
+| 对象池  | 10000    | 2.31242      | 4324.48 |
+
+**测试环境：**  Lenovo-XiaoXinPro-13ARE-2020，CPU：AMD Ryzen 7 4800U
 ---
 
 ### **六、扩展功能（可选）**
