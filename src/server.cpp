@@ -16,10 +16,10 @@ void RpcSession::readHeader()
     async_read(socket_, boost::asio::buffer(&header_, sizeof(RpcHeader)),
                [this, self](boost::system::error_code ec, size_t)
                {
-                std::cout<<"readHeader"<<std::endl;
+                //std::cout<<"readHeader"<<std::endl;
                 //std::cout << std::hex << header_.magic << std::endl;
-                std::cout<<header_.body_len<<std::endl;
-                std::cout<<header_.msg_id<<std::endl;
+                //std::cout<<header_.body_len<<std::endl;
+                //std::cout<<header_.msg_id<<std::endl;
                    if (ec)
                    {
                        std::cerr << "Read header error: " << ec.message() << "\n";
@@ -47,7 +47,7 @@ void RpcSession::readBody()
                        return;
                    }
                    handleRequest();
-                   readHeader(); // 继续处理下一个请求
+                   //readHeader(); // 继续处理下一个请求
                });
 }
 
@@ -55,13 +55,13 @@ void RpcSession::handleRequest()
 {
     try
     {
-        std::cout << "handleRequest" << std::endl;
+        //std::cout << "handleRequest" << std::endl;
         //std::cout<<body_buf_<<std::endl;
         // 反序列化请求
         auto j = nlohmann::json::parse(body_buf_);
         RpcRequest req = j.get<RpcRequest>();
-        std::cout << "method_name:" << req.method_name << std::endl;
-        std::cout << "params:" << req.params << std::endl;
+        //std::cout << "method_name:" << req.method_name << std::endl;
+        //std::cout << "params:" << req.params << std::endl;
 
         // 处理请求
         nlohmann::json result = router_.dispatch(req.method_name, req.params);
@@ -137,7 +137,7 @@ void RpcServer::startAccept()
             startAccept();
         });
 }
-
+/*
 int main() {
     try {
         
@@ -145,6 +145,29 @@ int main() {
         RpcServer server(io, 12345);
         std::cout << "Server running on port 12345\n";
         io.run();
+    } catch (const std::exception& e) {
+        std::cerr << "Server exception: " << e.what() << "\n";
+    }
+    return 0;
+}
+*/
+
+
+int main() {
+    try {
+        const int NUM_THREADS = std::thread::hardware_concurrency()*2; // 根据CPU核心数设置
+        boost::asio::thread_pool pool(NUM_THREADS);
+
+        io_context io;
+        RpcServer server(io, 12345);
+        std::cout << "Server running on port 12345 with " << NUM_THREADS << " threads\n";
+
+        // 在多个线程中运行io_context
+        for (int i = 0; i < NUM_THREADS; ++i) {
+            boost::asio::post(pool, [&io] { io.run(); });
+        }
+
+        pool.join(); // 等待所有线程完成
     } catch (const std::exception& e) {
         std::cerr << "Server exception: " << e.what() << "\n";
     }

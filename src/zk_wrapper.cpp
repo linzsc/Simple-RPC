@@ -17,16 +17,16 @@ ZooKeeperWrapper::~ZooKeeperWrapper() {
 
 void ZooKeeperWrapper::ensurePathExists(const std::string& path) {
     size_t pos = 0; 
-    std::cout<<"whole path :"<<path<<std::endl; 
+    //std::cout<<"whole path :"<<path<<std::endl; 
     
     while ((pos = path.find('/', pos + 1)) ) {
         std::string subPath = path.substr(0, pos);
-        std::cout<<"cur path :"<<subPath<<std::endl; 
+        //std::cout<<"cur path :"<<subPath<<std::endl; 
         if (subPath.empty())
             continue;
         struct Stat stat;
         int rc = zoo_exists(zk_handle_, subPath.c_str(), 0, &stat);
-        std::cout<<"zoo_exists, rc:"<<rc<<std::endl;
+        //std::cout<<"zoo_exists, rc:"<<rc<<std::endl;
         if (rc == ZNONODE) {
             char buffer[512];
             int buffer_len = sizeof(buffer);
@@ -36,7 +36,7 @@ void ZooKeeperWrapper::ensurePathExists(const std::string& path) {
                 std::cerr << "Failed to create path: " << subPath
                           << ", error: " << zerror(rc) << "\n";
             } else {
-                std::cout << "Created path: " << subPath << "\n";
+                //std::cout << "Created path: " << subPath << "\n";
             }
         }
         if(pos==std::string::npos){
@@ -50,7 +50,7 @@ void ZooKeeperWrapper::registerService(const std::string& service_name, const st
     std::string basePath = "/services/" + service_name;
     // 确保所有父节点存在
     ensurePathExists(basePath);
-    std::cout<<"endpoint: "<<endpoint<<std::endl;
+    //std::cout<<"endpoint: "<<endpoint<<std::endl;
     std::string path = basePath + "/" + endpoint;
     char buffer[512];
     int buffer_len = sizeof(buffer);

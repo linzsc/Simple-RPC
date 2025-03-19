@@ -48,7 +48,7 @@ int main() {
     for (auto& thread : threads) {
         thread.join();
     }
-
+    
     // 记录结束时间
     auto end = steady_clock::now();
     duration<double> duration = end - start;
@@ -66,13 +66,22 @@ int main() {
 }
 
 /*
-g++ -o test test/script.cpp  src/zk_wrapper.cpp  src/logger.cpp -I include -lzookeeper_mt -DTHREADED  -std=c++11 -lpthread -lglog
+g++ -o test_script test/script.cpp  src/zk_wrapper.cpp  src/logger.cpp -I include -lzookeeper_mt -DTHREADED  -std=c++11 -lpthread -lglog
 */
 
 /*
 测试结果：
+single thread:
+on 
 
 Total Requests: 10000
 Total Time: 6.03765 seconds
 QPS: 1656.27
+
+on Lenovo-XiaoXinPro-13ARE-2020:
+CPU:AMD Ryzen 7 48000U
+
+Total Requests: 10000
+Total Time: 4.43475 seconds
+QPS: 2254.92
 */
