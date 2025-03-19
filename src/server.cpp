@@ -10,6 +10,11 @@ void RpcSession::start()
     readHeader();
 }
 
+void RpcSession::reset(tcp::socket socket, Router & router) {
+    socket_ = std::move(socket);
+    router_ = router;
+}
+
 void RpcSession::readHeader()
 {
     auto self = shared_from_this();
@@ -121,6 +126,7 @@ RpcServer::RpcServer(io_context &io, short port)
     // 路由添加方法
     router_->resgister("add", CalculatorService::add);
 }
+/*
 
 void RpcServer::startAccept()
 {
@@ -133,6 +139,19 @@ void RpcServer::startAccept()
                 std::cout << "New connection from " << socket.remote_endpoint() << "\n";
 
                 std::make_shared<RpcSession>(std::move(socket), *router_)->start();
+            }
+            startAccept();
+        });
+}
+*/
+
+void RpcServer::startAccept() {
+    acceptor_.async_accept(
+        [this](boost::system::error_code ec, tcp::socket socket) {
+            if (!ec) {
+                std::cout << "New connection from " << socket.remote_endpoint() << "\n";
+                auto session = RpcSessionPool::getInstance().acquire(std::move(socket), *router_);
+                session->start();
             }
             startAccept();
         });
@@ -155,7 +174,7 @@ int main() {
 
 int main() {
     try {
-        const int NUM_THREADS = std::thread::hardware_concurrency()*2; // 根据CPU核心数设置
+        const int NUM_THREADS = std::thread::hardware_concurrency(); // 根据CPU核心数设置
         boost::asio::thread_pool pool(NUM_THREADS);
 
         io_context io;
@@ -174,5 +193,5 @@ int main() {
     return 0;
 }
 /*
-g++ -std=c++11 -o server src/server.cpp src/zk_wrapper.cpp -I include -lboost_system -lboost_thread -lzookeeper_mt -DTHREADED
+g++ -std=c++11 -g -o server src/server.cpp src/zk_wrapper.cpp -I include -lboost_system -lboost_thread -lzookeeper_mt -DTHREADED
 */
