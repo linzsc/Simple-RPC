@@ -1,42 +1,20 @@
-# 忽略编译生成的二进制文件（无扩展名）
-bin/
-build/
-out/
-release/
-debug/
-*.out
-*.elf
-*
-
-# 但保留源代码文件和其他需要版本控制的文件
+# 保留需要跟踪的文件类型（先定义例外）
 !*.cpp
 !*.h
 !*.hpp
 !*.c
-!*.hpp
 !*.txt
 !*.md
 !*.gitignore
 !CMakeLists.txt
 
+# 忽略其他所有文件
+*
 
-
-# 忽略Makefile生成的文件
-Makefile
-makefile
-*.mk
-
-# 忽略CMake生成的文件
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles/
-*.cmake
-cmake_install.cmake
-
-# 忽略VSCode相关文件
-.vscode/
-
-# 忽略日志文件
-.logs/
-
-
+# 其他忽略规则...
+bin/
+build/
+debug/
+*.out
+*.elf
+logs/
