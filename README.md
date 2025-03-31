@@ -125,51 +125,19 @@ graph TD
 ---
 
 #### **4.性能优化**
-(1) **连接池**  
-   - 复用TCP连接，减少握手开销  
-   ```cpp
-   class ConnectionPool {
-       std::queue<TcpConnection*> pool_;
-       std::mutex mutex_;
-   };
-   ```
 
-(2) **线程池**  
+
+(1) **线程池**  
    - 使用Boost.Asio的`io_context`线程池  
    ```cpp
    boost::asio::thread_pool pool(4); // 4线程
    ```
 
-(3) **零拷贝优化**  
-   - 使用`string_view`减少序列化内存拷贝  
-
----
-
-#### **测试与部署**
-1. **单元测试**  
-   - 使用Google Test验证协议、序列化、负载均衡逻辑  
-   ```cpp
-   TEST(RpcTest, BasicCall) {
-       auto result = client.call("add", 3, 5);
-       EXPECT_EQ(result, 8);
-   }
-   ```
-
-2. **压测工具**  
-   - 实现多线程压测客户端（模拟高并发场景）  
-   ```bash
-   ./benchmark --threads=100 --requests=10000
-   ```
-
-3. **Docker部署**  
-   - 编写Dockerfile一键部署服务端、客户端、ZooKeeper  
-   ```dockerfile
-   FROM ubuntu:20.04
-   RUN apt-get install -y libboost-all-dev libzookeeper-mt-dev
-   ```
-
----
-
+(2) **对象池**
+    - 使用内存池管理对象，减少内存分配开销
+    ```cpp
+    class RpcSessionPool
+    ```
 ### **四、代码结构示例**
 ```
 rpc-framework/

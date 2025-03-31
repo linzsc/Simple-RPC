@@ -145,6 +145,7 @@ void RpcServer::startAccept()
 }
 */
 
+
 void RpcServer::startAccept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
@@ -156,6 +157,7 @@ void RpcServer::startAccept() {
             startAccept();
         });
 }
+
 /*
 int main() {
     try {

@@ -25,7 +25,7 @@ public:
         
         // 选择服务实例
         std::string endpoint = lb_.selectEndpoint(endpoints);
-        LOG_INFO(endpoint);
+        //LOG_INFO(endpoint);
         size_t pos = endpoint.find(':');
         std::string host = endpoint.substr(0, pos);
         short port = std::stoi(endpoint.substr(pos + 1));
@@ -40,7 +40,7 @@ public:
         req.params = {args...};
         
        
-        LOG_INFO(nlohmann::json(req).dump());
+        //LOG_INFO(nlohmann::json(req).dump());
         RpcClient client(io_, host, port);
 
         return client.call(req);
