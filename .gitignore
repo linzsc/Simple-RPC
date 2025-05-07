@@ -1,0 +1,18 @@
+# 忽略所有文件和文件夹
+/*
+!/.gitignore
+
+# 保留 include 文件夹
+!/include/
+
+# 保留 src 文件夹
+!/src/
+
+# 保留 test 文件夹
+!/test/
+
+# 保留 CMakeLists.txt 文件
+!/CMakeLists.txt
+
+# 保留 .md 文件
+!*.md
