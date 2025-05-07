@@ -126,23 +126,13 @@ graph TD
 
 #### **4.性能优化**
 
-<<<<<<< HEAD
 
-=======
->>>>>>> b49741f3e1122249baca6b001268ee0755b97913
 (1) **线程池**  
    - 使用Boost.Asio的`io_context`线程池  
    ```cpp
    boost::asio::thread_pool pool(4); // 4线程
    ```
 
-<<<<<<< HEAD
-(2) **对象池**
-    - 使用内存池管理对象，减少内存分配开销
-    ```cpp
-    class RpcSessionPool
-    ```
-=======
 (2) **对象池**  
    - 使用RpcSession_pool对象池，减少会话的频繁创建和注销  
    ```cpp
@@ -161,9 +151,7 @@ graph TD
   
    ```
 
----
 
->>>>>>> b49741f3e1122249baca6b001268ee0755b97913
 ### **四、代码结构示例**
 ```
 rpc-framework/
@@ -197,12 +185,4 @@ rpc-framework/
 
 **测试环境：**  Lenovo-XiaoXinPro-13ARE-2020，CPU：AMD Ryzen 7 4800U
 ---
-
-### **六、扩展功能（可选）**
-1. **熔断与降级**：基于错误率自动屏蔽故障节点  
-2. **TLS加密**：Boost.Asio集成OpenSSL实现安全通信  
-3. **跨语言支持**：通过IDL生成其他语言客户端  
-
----
-
 
