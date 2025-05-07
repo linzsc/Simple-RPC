@@ -31,7 +31,7 @@ void Logger::init(const std::string& program_name, const std::string& log_dir) {
     FLAGS_alsologtostderr = false;
     FLAGS_colorlogtostderr = true;
     FLAGS_log_prefix = true;
-    FLAGS_logbufsecs = 2;
+    FLAGS_logbufsecs = 2;   //每隔2s进行一次刷盘
 
     stop_background_ = false;
     background_thread_ = std::thread([this]() { this->backgroundWriter(); });
